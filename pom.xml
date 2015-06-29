@@ -21,13 +21,13 @@
 		<dependency>
 			<groupId>com.newrelic.agent.java</groupId>
 			<artifactId>newrelic-agent</artifactId>
-			<version>3.8.2</version>
+			<version>3.17.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.newrelic.agent.java</groupId>
 			<artifactId>newrelic-api</artifactId>
-			<version>3.8.2</version>
+			<version>3.17.0</version>
 		</dependency>
 
 		<!-- Jetty -->
