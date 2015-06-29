@@ -10,6 +10,13 @@
 	</properties>
 	<dependencies>
 
+		<!-- MongoDB -->
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.12.3</version>
+		</dependency>
+
 		<!-- Newrelic -->
 		<dependency>
 			<groupId>com.newrelic.agent.java</groupId>
@@ -65,11 +72,8 @@
 			<version>2.5.0</version>
 			<type>jar</type>
 		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.4-1201-jdbc41</version>
-		</dependency>
+
+		<!-- json -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
