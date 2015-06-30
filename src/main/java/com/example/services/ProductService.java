@@ -1,6 +1,7 @@
 package com.example.services;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -16,6 +17,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.MapReduceCommand;
+import com.mongodb.MapReduceOutput;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
@@ -33,13 +36,8 @@ public class ProductService {
 	public Response getInfoFilter(@QueryParam("Comercio") String comercio,
 			@QueryParam("Categoria") String categoria,
 			@QueryParam("Producto") String producto) {
-		List<DBObject> myDoc = null;
+		List<DBObject> myDoc = new ArrayList<DBObject>();
 		try {
-			MongoClient mongo = new MongoClient(new MongoClientURI(URL));
-			DB db = mongo.getDB(DB);
-
-			DBCollection table = db.getCollection(CLL);
-
 			BasicDBObject searchQuery = new BasicDBObject();
 
 			if (comercio != null && !comercio.equals(""))
@@ -51,7 +49,7 @@ public class ProductService {
 			if (producto != null && !producto.equals(""))
 				searchQuery.put("Producto", producto);
 
-			myDoc = table.find(searchQuery).toArray();
+			myDoc = getDataSource().find(searchQuery).toArray();
 
 		} catch (UnknownHostException e) {
 			return Response.status(500)
@@ -68,25 +66,32 @@ public class ProductService {
 	public Response getInfoMapReduce(@QueryParam("Comercio") String comercio,
 			@QueryParam("Categoria") String categoria,
 			@QueryParam("Producto") String producto) {
-		List<DBObject> myDoc = null;
+		List<DBObject> myDoc = new ArrayList<DBObject>();
 		try {
-			MongoClient mongo = new MongoClient(new MongoClientURI(URL));
-			DB db = mongo.getDB(DB);
-
-			DBCollection table = db.getCollection(CLL);
-
-			BasicDBObject searchQuery = new BasicDBObject();
+			DBCollection table = getDataSource();
+			String searchQuery = "";
 
 			if (comercio != null && !comercio.equals(""))
-				searchQuery.put("Comercio", comercio);
+				searchQuery += "this.Comercio == '" + comercio + "' && ";
 
 			if (categoria != null && !categoria.equals(""))
-				searchQuery.put("Categoria", categoria);
+				searchQuery += "this.Categoria == '" + categoria + "' && ";
 
 			if (producto != null && !producto.equals(""))
-				searchQuery.put("Producto", producto);
+				searchQuery += "this.Producto == '" + producto + "' && ";
 
-			myDoc = table.find(searchQuery).toArray();
+			searchQuery += "true";
+
+			String map = "function() { if(" + searchQuery
+					+ "){emit(this._id, this);}}";
+			String reduce = "function(key, values) { return values;} ";
+
+			MapReduceCommand cmd = new MapReduceCommand(table, map, reduce,
+					null, MapReduceCommand.OutputType.INLINE, null);
+
+			MapReduceOutput out = table.mapReduce(cmd);
+
+			myDoc = (List<DBObject>) out.results();
 
 		} catch (UnknownHostException e) {
 			return Response.status(500)
@@ -95,6 +100,13 @@ public class ProductService {
 		}
 		return Response.status(200).header("Access-Control-Allow-Origin", "*")
 				.entity(myDoc.toString()).build();
+	}
+
+	private DBCollection getDataSource() throws UnknownHostException {
+		MongoClient mongo = new MongoClient(new MongoClientURI(URL));
+		DB db = mongo.getDB(DB);
+		DBCollection table = db.getCollection(CLL);
+		return table;
 	}
 
 	@OPTIONS
@@ -108,4 +120,3 @@ public class ProductService {
 						"AUTHORIZATION, content-type, accept").build();
 	}
 }
-
