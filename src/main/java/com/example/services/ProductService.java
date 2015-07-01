@@ -102,6 +102,46 @@ public class ProductService {
 				.entity(myDoc.toString()).build();
 	}
 
+	@GET
+	@Path("/PageFilter")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getInfoPageFilter(@QueryParam("Comercio") String comercio,
+			@QueryParam("Categoria") String categoria,
+			@QueryParam("Producto") String producto,
+			@QueryParam("Pagina") String pagina,
+			@QueryParam("RegXPagina") String regXPagina) {
+		List<DBObject> myDoc = new ArrayList<DBObject>();
+		try {
+			BasicDBObject searchQuery = new BasicDBObject();
+			int pag = 1;
+			int reg = 10;
+			if (pagina != null && !pagina.equals(""))
+				pag = Integer.parseInt(pagina);
+
+			if (regXPagina != null && !regXPagina.equals(""))
+				reg = Integer.parseInt(regXPagina);
+
+			if (comercio != null && !comercio.equals(""))
+				searchQuery.put("Comercio", comercio);
+
+			if (categoria != null && !categoria.equals(""))
+				searchQuery.put("Categoria", categoria);
+
+			if (producto != null && !producto.equals(""))
+				searchQuery.put("Producto", producto);
+
+			myDoc = getDataSource().find(searchQuery).limit(reg)
+					.skip(reg * (pag - 1)).toArray();
+
+		} catch (UnknownHostException e) {
+			return Response.status(500)
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(e.getMessage()).build();
+		}
+		return Response.status(200).header("Access-Control-Allow-Origin", "*")
+				.entity(myDoc.toString()).build();
+	}
+
 	private DBCollection getDataSource() throws UnknownHostException {
 		MongoClient mongo = new MongoClient(new MongoClientURI(URL));
 		DB db = mongo.getDB(DB);
