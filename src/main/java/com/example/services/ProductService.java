@@ -13,6 +13,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -25,7 +27,8 @@ import com.mongodb.MongoClientURI;
 @Path("/Product")
 @Produces(MediaType.APPLICATION_JSON)
 public class ProductService {
-
+	
+	private final static Logger logger = Logger.getLogger(ProductService.class);
 	private static String URL = "mongodb://experiment_latency:experiment_latency@ds043971.mongolab.com:43971/experiment_latency";
 	private static String DB = "experiment_latency";
 	private static String CLL = "experiment_latency";
@@ -36,6 +39,11 @@ public class ProductService {
 	public Response getInfoFilter(@QueryParam("Comercio") String comercio,
 			@QueryParam("Categoria") String categoria,
 			@QueryParam("Producto") String producto) {
+		
+		logger.info("procesando petición, Comercio: " + comercio 
+				+ " Categoria: " + categoria
+				+ " Producto: " + producto);
+		
 		List<DBObject> myDoc = new ArrayList<DBObject>();
 		try {
 			BasicDBObject searchQuery = new BasicDBObject();
@@ -56,6 +64,8 @@ public class ProductService {
 					.header("Access-Control-Allow-Origin", "*")
 					.entity(e.getMessage()).build();
 		}
+		
+		logger.info("fin petición");
 		return Response.status(200).header("Access-Control-Allow-Origin", "*")
 				.entity(myDoc.toString()).build();
 	}
