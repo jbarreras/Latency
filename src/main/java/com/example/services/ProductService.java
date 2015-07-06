@@ -29,7 +29,8 @@ import com.mongodb.MongoClientURI;
 public class ProductService {
 	
 	private final static Logger logger = Logger.getLogger(ProductService.class);
-	private static String URL = "mongodb://experiment_latency:experiment_latency@ds043971.mongolab.com:43971/experiment_latency";
+	// private static String URL = "mongodb://experiment_latency:experiment_latency@ds043971.mongolab.com:43971/experiment_latency";
+	private static String URL = "mongodb://172.24.98.152:27017,172.24.98.153:27017,172.24.98.154:27017/";
 	private static String DB = "experiment_latency";
 	private static String CLL = "experiment_latency";
 
