@@ -65,7 +65,12 @@ public class ProductService {
 			if (producto != null && !producto.equals(""))
 				searchQuery.put("Producto", producto);
 
-			myDoc = getDataSource().find(searchQuery).toArray();
+			
+			MongoClient mongo = new MongoClient(new MongoClientURI(URL));
+			DB db = mongo.getDB(DB);
+			DBCollection table = db.getCollection(CLL);
+			myDoc = table.find(searchQuery).toArray();
+			mongo.close();
 
 		} catch (UnknownHostException e) {
 			return Response.status(500)
@@ -90,7 +95,9 @@ public class ProductService {
 				+ " Producto: " + producto);
 		List<DBObject> myDoc = new ArrayList<DBObject>();
 		try {
-			DBCollection table = getDataSource();
+			MongoClient mongo = new MongoClient(new MongoClientURI(URL));
+			DB db = mongo.getDB(DB);
+			DBCollection table = db.getCollection(CLL);			
 			String searchQuery = "";
 
 			if (comercio != null && !comercio.equals(""))
@@ -114,6 +121,7 @@ public class ProductService {
 			MapReduceOutput out = table.mapReduce(cmd);
 
 			myDoc = (List<DBObject>) out.results();
+			mongo.close();
 
 		} catch (UnknownHostException e) {
 			return Response.status(500)
@@ -158,8 +166,12 @@ public class ProductService {
 			if (producto != null && !producto.equals(""))
 				searchQuery.put("Producto", producto);
 
-			myDoc = getDataSource().find(searchQuery).limit(reg)
+			MongoClient mongo = new MongoClient(new MongoClientURI(URL));
+			DB db = mongo.getDB(DB);
+			DBCollection table = db.getCollection(CLL);
+			myDoc = table.find(searchQuery).limit(reg)
 					.skip(reg * (pag - 1)).toArray();
+			mongo.close();
 
 		} catch (UnknownHostException e) {
 			return Response.status(500)
@@ -172,12 +184,12 @@ public class ProductService {
 				.entity(myDoc.toString()).build();
 	}
 
-	private DBCollection getDataSource() throws UnknownHostException {
-		MongoClient mongo = new MongoClient(new MongoClientURI(URL));
-		DB db = mongo.getDB(DB);
-		DBCollection table = db.getCollection(CLL);
-		return table;
-	}
+//	private DBCollection getDataSource() throws UnknownHostException {
+//		MongoClient mongo = new MongoClient(new MongoClientURI(URL));
+//		DB db = mongo.getDB(DB);
+//		DBCollection table = db.getCollection(CLL);
+//		return table;
+//	}
 
 	@OPTIONS
 	public Response cors(@javax.ws.rs.core.Context HttpHeaders requestHeaders) {
