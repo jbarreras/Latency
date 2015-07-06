@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
@@ -33,6 +34,12 @@ public class ProductService {
 	private static String URL = "mongodb://172.24.98.152:27017,172.24.98.153:27017,172.24.98.154:27017/";
 	private static String DB = "experiment_latency";
 	private static String CLL = "experiment_latency";
+	
+	
+	@PostConstruct
+	public void init() {
+	  logger.info("--->  mongo uri: " + URL);
+	}
 
 	@GET
 	@Path("/Filter")
@@ -41,7 +48,7 @@ public class ProductService {
 			@QueryParam("Categoria") String categoria,
 			@QueryParam("Producto") String producto) {
 		
-		logger.info("procesando petición, Comercio: " + comercio 
+		logger.info("procesando petición Filter, Comercio: " + comercio 
 				+ " Categoria: " + categoria
 				+ " Producto: " + producto);
 		
@@ -66,7 +73,7 @@ public class ProductService {
 					.entity(e.getMessage()).build();
 		}
 		
-		logger.info("fin petición");
+		logger.info("fin petición Filter");
 		return Response.status(200).header("Access-Control-Allow-Origin", "*")
 				.entity(myDoc.toString()).build();
 	}
@@ -77,6 +84,10 @@ public class ProductService {
 	public Response getInfoMapReduce(@QueryParam("Comercio") String comercio,
 			@QueryParam("Categoria") String categoria,
 			@QueryParam("Producto") String producto) {
+		
+		logger.info("procesando petición MapReduce, Comercio: " + comercio 
+				+ " Categoria: " + categoria
+				+ " Producto: " + producto);
 		List<DBObject> myDoc = new ArrayList<DBObject>();
 		try {
 			DBCollection table = getDataSource();
@@ -109,6 +120,8 @@ public class ProductService {
 					.header("Access-Control-Allow-Origin", "*")
 					.entity(e.getMessage()).build();
 		}
+		
+		logger.info("fin petición MapReduce");
 		return Response.status(200).header("Access-Control-Allow-Origin", "*")
 				.entity(myDoc.toString()).build();
 	}
@@ -121,6 +134,10 @@ public class ProductService {
 			@QueryParam("Producto") String producto,
 			@QueryParam("Pagina") String pagina,
 			@QueryParam("RegXPagina") String regXPagina) {
+		
+		logger.info("procesando petición PageFilter, Comercio: " + comercio 
+				+ " Categoria: " + categoria
+				+ " Producto: " + producto);
 		List<DBObject> myDoc = new ArrayList<DBObject>();
 		try {
 			BasicDBObject searchQuery = new BasicDBObject();
@@ -149,6 +166,8 @@ public class ProductService {
 					.header("Access-Control-Allow-Origin", "*")
 					.entity(e.getMessage()).build();
 		}
+		
+		logger.info("fin petición PageFilter");
 		return Response.status(200).header("Access-Control-Allow-Origin", "*")
 				.entity(myDoc.toString()).build();
 	}
